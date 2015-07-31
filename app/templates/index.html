@@ -1,9 +1,30 @@
 <html>
     <head>
-        <title>FOOOOOO</title>
-        {% assets "css_all" %}
+        <title>SLoBR Episode View</title>
+        {% assets "scss_all" %}
             <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
         {% endassets %}
     </head>
-    <body>Bar. Baz. Quux.</body>
+    <body>
+        <div id="banner">
+            <span id="banner-items">BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
+        </div>
+        <div id="content">
+            <div class="header">SLoBR Episode View</div>
+            <div class="listing" id="episodes">
+               {% for episode in episodes %}
+               <div class="list-item">
+                   <div class="one-third-column">
+                       <img src="http://ichef.bbci.co.uk/images/ic/240x135/{{ episode["image"] }}.jpg"/>
+                   </div>
+                   <div class="two-thirds-column">
+                       <div class="title" title="{{ episode["uri"]|safe }}">{{ episode["title"]|safe }}</div>
+                       <div class="date">First broadcast on {{ episode["date"]|safe }}</div>
+                       <div class="short_synopsis">{{ episode["short_synopsis"]|safe }}</div>
+                   </div>
+               </div>
+               {% endfor %}
+            </div>
+        </div>
+    </body>
 </html>

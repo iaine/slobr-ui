@@ -17,6 +17,7 @@ class DevelopmentConfig(Config):
     ENDPOINT = "http://127.0.0.1:8890/sparql" # default virtuoso endpoint location
     USER = "testuser",
     SASS = basedir + "/app/sass/"
+    SLOBR_QUERY_DIR = basedir + "/app/sparql/"
 
 
 config = {

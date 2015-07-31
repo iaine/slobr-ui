@@ -11,16 +11,12 @@ def create_app(config_name):
     config[config_name].init_app(app)
 
     env = assets.Environment(app)
+    env.url = app.static_url_path
     # where do our SASS files live?
-    env.load_path = app.config["SASS"]
-    env.register(
-        'css_all', 
-        assets.Bundle(
-            'all.sass',
-            filters="sass",
-            output="css_all.css"
-        )
-    )
+    scss = assets.Bundle('all.scss', filters='pyscss', output='all.css')
+    
+    env.register('scss_all', scss)
+
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
