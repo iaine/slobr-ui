@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>SLoBR Episode View</title>
+        <title>SLoBR Episodes Listing</title>
         {% assets "scss_all" %}
             <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
         {% endassets %}
@@ -14,14 +14,16 @@
             <div class="listing" id="episodes">
                {% for episode in episodes %}
                <div class="list-item">
-                   <div class="one-third-column">
-                       <img src="http://ichef.bbci.co.uk/images/ic/240x135/{{ episode["image"] }}.jpg"/>
-                   </div>
-                   <div class="two-thirds-column">
-                       <div class="title" title="{{ episode["uri"]|safe }}">{{ episode["title"]|safe }}</div>
-                       <div class="date">First broadcast on {{ episode["date"]|safe }}</div>
-                       <div class="short_synopsis">{{ episode["short_synopsis"]|safe }}</div>
-                   </div>
+                   <a href="episode?pid={{ episode["pid"]|safe }}">
+                       <div class="one-third-column left">
+                           <img src="http://ichef.bbci.co.uk/images/ic/240x135/{{ episode["image"] }}.jpg"/>
+                       </div>
+                       <div class="two-thirds-column right">
+                           <div class="title" title="{{ episode["pid"]|safe }}">{{ episode["title"]|safe }}</div>
+                           <div class="date">First broadcast on {{ episode["date"]|safe }}</div>
+                           <div class="short_synopsis">{{ episode["short_synopsis"]|safe }}</div>
+                       </div>
+                    </a>
                </div>
                {% endfor %}
             </div>

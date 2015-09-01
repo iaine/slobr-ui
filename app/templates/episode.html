@@ -1,0 +1,56 @@
+<html>
+    <head>
+        <title>SLoBR Episode View</title>
+        {% assets "scss_all" %}
+            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+        {% endassets %}
+    </head>
+    <body>
+        <div id="banner">
+            <span id="banner-items">BbC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
+        </div>
+        <div id="content">
+            <div class="header">SLoBR Episode View</div>
+            <div class="listing" id="episodes">
+               <div class="two-thirds-column left">
+                   <div class="contentblock">
+                       <img src="http://ichef.bbci.co.uk/images/ic/640x360/{{ episode["image"] }}.jpg"/>
+                       <div class="title" title="{{ episode["uri"]|safe }}">{{ episode["title"]|safe }}</div>
+                       <div class="long_synopsis">{{ episode["long_synopsis"]|safe }}</div>
+                   </div>
+                   <div class="contentblock">
+                       {% if segContrib %}
+                           <div class="segments">Featured segments:
+                                {% for s in segContrib %}
+                                    <div class="segment">
+                                        <span class="title" title=" {{s|safe}}">
+                                            {{ segContrib[s]["title"] |safe }}
+                                        </span >
+                                        <span class="contributors"> by
+                                            {% for c in segContrib[s]["contributors"] %}
+                                           <span title={{ c["contributorUri"]|safe }}>  
+                                                {{ c["contributorName"] }}
+                                           </span>
+                                            {% endfor %}
+                                        </span >
+                                    </div>
+                                {% endfor %}
+                           </div>
+                        {% else %}
+                           <strong>Note: No segment information is available for this episode</strong>
+                        {% endif %}
+                    </div>
+              </div>
+               <div class="one-third-column right">
+                   <div class="date">First broadcast on {{ episode["date"]|safe }}</div>
+                   {% if episode.nextEpisode %}
+                       <a href=episode?pid={{ episode["nextEpisode"] }}>Next episode</a>
+                   {% endif %}                  
+                   {% if episode.previousEpisode %}
+                       <a href=episode?pid={{ episode["previousEpisode"] }}>Previous episode</a>
+                   {% endif %}                  
+               </div>
+            </div>
+        </div>
+    </body>
+</html>
