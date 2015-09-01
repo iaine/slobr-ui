@@ -14,13 +14,17 @@ from . import main
 @main.route('/episodes', methods=['GET', 'POST'])
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    episodes = select_episodes()
+    targets = None
+    # if a source episode is provided, only list the episodes that share contributors with the source
+    if request.args.get('contributorSource'):
+        targets = select_same_contributor_episodes(request.args.get('contributorSource'))
+    episodes = select_episodes(targets)
     return render_template("index.html", episodes = episodes)
 
 @main.route('/episode', methods=['GET', 'POST'])
 def episode(): 
     if request.args.get('pid'):
-        episode = select_episodes(request.args.get('pid'))[0]
+        episode = select_episodes([request.args.get('pid')])[0]
         segments = select_segments_by_episode(request.args.get('pid'))
         segContrib = select_contributors_by_segments(segments)
         return render_template("episode.html", episode = episode, segContrib = segContrib)
@@ -28,16 +32,21 @@ def episode():
         return redirect(url_for('.index'))
 
 
-
-def select_episodes(pid=None):
+def select_episodes(episodePids=None):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
     selectEpisodesQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_episodes.rq").read()
-    if pid is None:
+    if episodePids is None:
         selectEpisodesQuery = selectEpisodesQuery.format(uri = "")
     else:
-        selectEpisodesQuery = selectEpisodesQuery.format(uri = "BIND(<" + pid + "> as ?uri) .")
+        epVals = "VALUES ?uri { \n"
+        for ep in episodePids:
+            # following weirdness is because SPARQL (or Virtuoso?) doesn't seem to like
+            # VALUES parameters with expanded URIs
+            epVals += "bbc:" + ep.replace(app.config["EPISODE_BASE"], "") + "\n"
+        epVals += "}"
+        selectEpisodesQuery = selectEpisodesQuery.format(uri = epVals)
     sparql.setQuery(selectEpisodesQuery)
     sparql.setReturnFormat(JSON)
     episodeResults = sparql.query().convert()
@@ -49,7 +58,6 @@ def select_episodes(pid=None):
                    "%Y-%m-%d"), 
                  "%A %B %d %Y"
                )
-        print(date)
         epResults = {
             "uri": e["uri"]["value"],
             "pid": e["uri"]["value"].replace("http://slobr.linkedmusic.org/", ""),
@@ -74,11 +82,9 @@ def select_segments_by_episode(episodePid):
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
     selectSegmentsQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_segments_by_episode.rq").read()
     selectSegmentsQuery = selectSegmentsQuery.format(uri = "BIND(<" + episodePid + "> as ?uri) .")
-    print selectSegmentsQuery
     sparql.setQuery(selectSegmentsQuery)
     sparql.setReturnFormat(JSON)
     segmentResults = sparql.query().convert()
-    pprint(segmentResults)
     segments = list()
     for s in segmentResults["results"]["bindings"]:
         segments.append({
@@ -118,3 +124,20 @@ def select_contributors_by_segments(segments):
         })
 
     return segments
+
+
+def select_same_contributor_episodes(sourceEpisode):
+    app = current_app._get_current_object()
+    sparql = SPARQLWrapper(app.config["ENDPOINT"])
+    sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    selectContributorsQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_same_contributor_episodes.rq").read()
+    sourceEpisode = "BIND(<" + sourceEpisode + "> as ?sourceEpisode) ."
+    selectContributorsQuery = selectContributorsQuery.format(sourceEpisode = sourceEpisode)
+    print selectContributorsQuery
+    sparql.setQuery(selectContributorsQuery)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    episodes = list()
+    for r in results["results"]["bindings"]:
+        episodes.append(r["targetEpisode"]["value"])
+    return episodes 

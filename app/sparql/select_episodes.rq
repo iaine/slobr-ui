@@ -1,6 +1,7 @@
 PREFIX po: <http://purl.org/ontology/po/>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX slobr: <http://slobr.linkedmusic.org/terms/>
+PREFIX bbc: <http://www.bbc.co.uk/programmes/>
 
 select distinct ?uri ?title ?date ?short_synopsis ?medium_synopsis ?long_synopsis ?image ?nextEpisode ?previousEpisode where {{
     graph <http://slobr.linkedmusic.org/EMS> {{
