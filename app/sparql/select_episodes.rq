@@ -1,0 +1,16 @@
+PREFIX po: <http://www.bbc.co.uk/ontologies/programmes/>
+PREFIX dct: <http://purl.org/dc/terms/>
+
+select distinct ?uri ?title ?date ?short_synopsis ?medium_synopsis ?long_synopsis ?image where {{
+    graph <http://slobr.linkedmusic.org/EMS> {{
+        {uri}
+        ?uri a po:Episode; 
+            dct:date ?date ;
+            dct:title ?title ;
+            po:short_synopsis ?short_synopsis ;
+            po:medium_synopsis ?medium_synopsis ;
+            po:long_synopsis ?long_synopsis ;
+            dct:relation ?image .
+    }}
+}}
+order by desc(?date) 
