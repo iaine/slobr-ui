@@ -32,6 +32,46 @@ def episode():
         return redirect(url_for('.index'))
 
 
+@main.route('/work', methods=['GET', 'POST'])
+def work():
+    if request.args.get('workid'):
+        work = select_blob(request.args.get('workid'))
+        return render_template("work.html", work = work)
+    else:
+        return redirect(url_for('.index'))
+
+
+def select_blob(uri):
+    app = current_app._get_current_object()
+    sparql = SPARQLWrapper(app.config["ENDPOINT"])
+    sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    selectQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_blob.rq").read()
+    selectQuery = selectQuery.format(uri = uri)
+    sparql.setQuery(selectQuery)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    extracted = dict()
+    for r in results["results"]["bindings"]:
+        if r["p"]["value"] not in extracted:
+            extracted[r["p"]["value"]] = list()
+        extracted[r["p"]["value"]].append(r["o"]["value"])
+
+    context = { 
+        "mo": "http://purl.org/ontology/mo/",
+        "po": "http://purl.org/ontology/po/",
+        "slobr": "http://slobr.linkedmusic.org/terms/",
+        "dct": "http://purl.org/dc/terms/",
+        "salt": "http://slobr.linkedmusic.org/salt/",
+        "saltset": "http://slobr.linkedmusic.org/saltset/",
+        "contrib": "http://slobr.linkedmusic.org/contributors/",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+    }
+
+    g = Graph().parse(data=json.dumps(extracted), format="json-ld")
+    blob = g.serialize(format="json-ld", auto_compact=True, context=context, indent=4)
+    return json.loads(blob)
+    
 def select_episodes(episodePids=None):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])

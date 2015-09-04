@@ -1,0 +1,40 @@
+{# macro to display a ?p ?o combination for this item #}
+{# it's possible that ?o is a list, if there are multiple matches #}
+{% macro unpack(payload) -%}
+    {% if payload is string %}
+        {{ payload }}
+    {% else %} {# there are multiple matches #}
+        {% for item in payload %}
+            <span> {{ item }} </span>
+        {% endfor %}
+    {% endif %} 
+{% endmacro %}
+
+<html>
+    <head>
+        <title>SLoBR Episode View</title>
+        {% assets "scss_all" %}
+            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+        {% endassets %}
+    </head>
+    <body>
+        <div id="banner">
+            <span id="banner-items">BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
+        </div>
+        <div id="content">
+            <div class="header">SLoBR Work View</div>
+            <div class="listing" id="work">
+               <div class="two-thirds-column left">
+                   <div class="contentblock">
+                       <div class="title">
+                           {{ unpack(work["dct:title"]) }}
+                       </div>
+                       {{ unpack(work["dct:contributor"]) }} 
+                   </div>
+              </div>
+               <div class="one-third-column right">
+               </div>
+            </div>
+        </div>
+    </body>
+</html>

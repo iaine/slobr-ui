@@ -1,0 +1,34 @@
+# select all information on a particular entity
+# if that entity has been SALT-matched to another entity, 
+# also include that other entity's information
+
+PREFIX salt: <http://slobr.linkedmusic.org/salt/>
+PREFIX saltset: <http://slobr.linkedmusic.org/saltsets/>
+PREFIX : <http://slobr.linkedmusic.org/>
+
+select distinct ?p ?o where {{ 
+    BIND(<{uri}> as ?this) . # our source entity
+    VALUES ?contentGraphs {{ # all "dataset" graphs hardcoded here
+        :EMS
+        :SLICKMEM
+    }}
+    {{  # Case where there is a match decision and hence multiple matchParticipants
+        ?matchDecision a :matchDecision .
+        ?this :matchParticipant ?matchDecision .
+        ?other :matchParticipant ?matchDecision .
+
+        graph ?contentGraphs {{ 
+            {{ ?this ?p ?o }} UNION
+            {{ ?other ?p ?o }} .
+        }}
+    }} UNION {{ 
+        # Case where there is no match decision
+        ?this salt:in_saltset ?saltset .
+        graph ?contentGraphs {{ 
+            ?this ?p ?o .
+        }}
+    }}
+}}
+
+
+

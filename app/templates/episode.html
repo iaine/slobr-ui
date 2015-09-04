@@ -24,7 +24,9 @@
                                 {% for s in segContrib %}
                                     <div class="segment">
                                         <span class="title" title=" {{s|safe}}">
-                                            {{ segContrib[s]["title"] |safe }}
+                                            <a href=work?workid={{s |safe }}>
+                                                {{ segContrib[s]["title"] |safe }}
+                                            </a>
                                         </span >
                                         <span class="contributors"> by
                                             {% for c in segContrib[s]["contributors"] %}
