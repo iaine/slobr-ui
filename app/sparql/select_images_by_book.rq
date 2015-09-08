@@ -1,0 +1,14 @@
+PREFIX po: <http://purl.org/ontology/po/>
+PREFIX slobr: <http://slobr.linkedmusic.org/terms/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX bbc: <http://www.bbc.co.uk/programmes/>
+
+select distinct ?image where {{
+    graph <http://slobr.linkedmusic.org/SLICKMEM> {{
+        {book}
+        ?book a bibo:Book ; 
+            foaf:depiction ?image .
+    }}
+}}
+order by ?book ?image
+

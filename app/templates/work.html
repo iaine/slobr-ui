@@ -29,8 +29,24 @@
                        <div class="title">
                            {{ unpack(work["dct:title"]) }}
                        </div>
+                       <div>
+                       Contributors:
                        {{ unpack(work["dct:contributor"]) }} 
+                       </div>
+                       <div>
+                       Artist:
+                       {{ unpack(work["slobr:artist"]) }} 
+                       </div>
+                       <div>
+                       Recorded as:
+                       {{ unpack(work["mo:recorded_as"]) }}
+                       </div>
                    </div>
+                   {% if images is iterable %}
+                       {% for image in images %}
+                          <img src={{ image }} width=400/>
+                       {% endfor %}
+                   {% endif %}
               </div>
                <div class="one-third-column right">
                </div>

@@ -36,7 +36,13 @@ def episode():
 def work():
     if request.args.get('workid'):
         work = select_blob(request.args.get('workid'))
-        return render_template("work.html", work = work)
+        if "dct:isPartOf" in work:
+            images = select_images_by_book(work["dct:isPartOf"])
+        else:
+            images = None
+        print json.dumps(work, indent=4)
+#        print json.dumps(images, indent=4)
+        return render_template("work.html", work = work, images = images)
     else:
         return redirect(url_for('.index'))
 
@@ -127,9 +133,10 @@ def select_segments_by_episode(episodePid):
     segmentResults = sparql.query().convert()
     segments = list()
     for s in segmentResults["results"]["bindings"]:
+        segEventPosition = s["segEventsPosition"] if "segEventPosition" in s else None
         segments.append({
             "segEvents": s["segEvents"]["value"],
-            "segEventsPosition": s["segEventsPosition"]["value"],
+            "segEventsPosition": segEventPosition,
             "segment": s["segment"]["value"]
             })
     return segments 
@@ -181,3 +188,22 @@ def select_same_contributor_episodes(sourceEpisode):
     for r in results["results"]["bindings"]:
         episodes.append(r["targetEpisode"]["value"])
     return episodes 
+
+def select_images_by_book(books):
+    app = current_app._get_current_object()
+    sparql = SPARQLWrapper(app.config["ENDPOINT"])
+    sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    selectImagesQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_images_by_book.rq").read()
+    b = "VALUES ?book { \n" 
+    for book in books:
+        b += "<" + book + ">\n"
+    b += " }"
+    selectImagesQuery = selectImagesQuery.format(book = b)
+    sparql.setQuery(selectImagesQuery)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    images = list()
+    for r in results["results"]["bindings"]:
+        images.append(r["image"]["value"])
+    return images 
+
