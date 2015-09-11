@@ -1,8 +1,11 @@
 $font-stack:    Helvetica, sans-serif;
 $page-margin: 18px;
-$gutter-width: 5px;
+$gutter-width: 2px;
 $full-page-width: 1008px;
 $full-col-width: $full-page-width - $page-margin;
+$one-third-col-width:$full-col-width/3 - $gutter-width/2;
+$two-thirds-col-width:2*($full-col-width/3) - $gutter-width/2;
+
 $text-color: #ccc;
 
 body {
@@ -12,7 +15,12 @@ body {
 #banner { 
   width: 100%;
   background: #333;
-  
+ 
+  a { 
+    color:#fff;
+    text-decoration:none; 
+  }
+
   #banner-items { 
       width:$full-col-width;
       margin-right: $page-margin/2;
@@ -28,6 +36,23 @@ body {
   margin-left: $page-margin/2;
   width:$full-col-width;
   color:$text-color;
+
+  #scoreimages { 
+      img { 
+          width: $two-thirds-col-width - 20px; // leave space for scrollbar
+          padding-top:5px;
+          padding-bottom:5;
+      }
+      height: 550px;
+      overflow:auto;
+  }
+
+  .bio img { 
+    display:block;
+    padding:15px;
+    max-width: $two-thirds-col-width -30; // leave space for padding
+    max-height: 400px;
+  }
 
   a { 
       color:$text-color;
@@ -48,18 +73,19 @@ body {
       clear:both;
       margin-top:$gutter-width;
       height:135px;
+      .one-third-column, .two-thirds-column { 
+          height: 100%;
+      }
   }
 
   .one-third-column { 
-      width:$full-col-width/3 - $gutter-width/2;
+      width:$one-third-col-width;
       background:#933;
-      height:100%;
   }
 
   .two-thirds-column { 
-      width: 2*($full-col-width/3) - $gutter-width/2;
+      width:$two-thirds-col-width;
       background:#933;
-      height:100%;
   }
 
   .left { 

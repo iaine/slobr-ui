@@ -12,10 +12,10 @@ class Config:
 class DevelopmentConfig(Config): 
     DEBUG = True
     BASE_URI = "http://slobr.linkedmusic.org/" # default virtuoso port
-    SPARQLUSER = "sparqlusername"
-    SPARQLPASSWORD = "sparqlpassword"
+    SPARQLUSER = "slobr"
+    SPARQLPASSWORD = "slobr"
     ENDPOINT = "http://127.0.0.1:8890/sparql" # default virtuoso endpoint location
-    USER = "testuser",
+    USER = "slobr",
     SASS = basedir + "/app/sass/"
     SLOBR_QUERY_DIR = basedir + "/app/sparql/"
     EPISODE_BASE = "http://www.bbc.co.uk/programmes/"

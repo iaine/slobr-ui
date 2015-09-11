@@ -8,15 +8,15 @@ PREFIX : <http://slobr.linkedmusic.org/>
 
 select distinct ?p ?o where {{ 
     BIND(<{uri}> as ?this) . # our source entity
+    BIND(<{trustedGraph}> as ?trustedGraph) . # the trusted match decisions
     VALUES ?contentGraphs {{ # all "dataset" graphs hardcoded here
         :EMS
         :SLICKMEM
     }}
     {{  # Case where there is a match decision and hence multiple matchParticipants
-        ?matchDecision a :matchDecision .
-        ?this :matchParticipant ?matchDecision .
-        ?other :matchParticipant ?matchDecision .
-
+        graph ?trustedGraph {{ 
+            ?this (:matchParticipant/^:matchParticipant)+ ?other .
+        }}
         graph ?contentGraphs {{ 
             {{ ?this ?p ?o }} UNION
             {{ ?other ?p ?o }} .

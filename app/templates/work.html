@@ -19,7 +19,7 @@
     </head>
     <body>
         <div id="banner">
-            <span id="banner-items">BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
+            <span id="banner-items"><a href="/">SLoBR </a>| BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
         </div>
         <div id="content">
             <div class="header">SLoBR Work View</div>
@@ -31,24 +31,37 @@
                        </div>
                        <div>
                        Contributors:
-                       {{ unpack(work["dct:contributor"]) }} 
-                       </div>
-                       <div>
-                       Artist:
-                       {{ unpack(work["slobr:artist"]) }} 
+                       {% for c in contributors %}
+                         <a href="/contributor?contributor={{ c }}">
+                            {{ contributors[c] }}
+                         </a> 
+                       {% endfor %}
                        </div>
                        <div>
                        Recorded as:
                        {{ unpack(work["mo:recorded_as"]) }}
                        </div>
                    </div>
-                   {% if images is iterable %}
-                       {% for image in images %}
-                          <img src={{ image }} width=400/>
-                       {% endfor %}
-                   {% endif %}
+                   <div id="scoreimages">
+                       {% if images is iterable %}
+                           {% for image in images %}
+                                {% if loop.index < 10 %} {# only show first 10 images for now as they are pretty huge - in future, do better with diva.js #}
+                                  <img src={{ image }}/>
+                                {% endif %}
+                           {% endfor %}
+                       {% endif %}
+                   </div>
               </div>
                <div class="one-third-column right">
+                   <div class="explore">
+                       {# there may be more than one contributor #}
+                       {% if work["dct:contributor"] is string %}
+                       <a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring these contributors</a>
+                       {% else %}
+                       <a href=episodes?contributor={{work["dct:contributor"]|join("|") }}>All episodes featuring these contributors</a>
+                       {% endif %}
+                   </div>
+
                </div>
             </div>
         </div>

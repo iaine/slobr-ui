@@ -18,6 +18,8 @@ def index():
     # if a source episode is provided, only list the episodes that share contributors with the source
     if request.args.get('contributorSource'):
         targets = select_same_contributor_episodes(request.args.get('contributorSource'))
+    elif request.args.get('contributor'):
+        targets = select_this_contributor_episodes(request.args.get('contributor').split("|"))
     episodes = select_episodes(targets)
     return render_template("index.html", episodes = episodes)
 
@@ -36,14 +38,31 @@ def episode():
 def work():
     if request.args.get('workid'):
         work = select_blob(request.args.get('workid'))
+        contributors = select_contributors(work["dct:contributor"])
+        print contributors 
+        print "!!!!!"
         if "dct:isPartOf" in work:
             images = select_images_by_book(work["dct:isPartOf"])
         else:
             images = None
         print json.dumps(work, indent=4)
-#        print json.dumps(images, indent=4)
-        return render_template("work.html", work = work, images = images)
+        return render_template("work.html", work = work, images = images, contributors = contributors)
     else:
+        return redirect(url_for('.index'))
+
+@main.route('/contributor', methods=['GET', 'POST'])
+def contributor():
+    if request.args.get('contributor'):
+        contributor = select_blob(request.args.get('contributor'))
+        external = None
+        if "slobr:linkedbrainz_uri" in contributor:
+            try: 
+                external = select_external_contributor(contributor["slobr:linkedbrainz_uri"])
+                print json.dumps(external, indent=4)
+            except:
+                pass
+        return render_template("contributor.html", contributor=contributor, external=external)
+    else: 
         return redirect(url_for('.index'))
 
 
@@ -52,7 +71,9 @@ def select_blob(uri):
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
     selectQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_blob.rq").read()
-    selectQuery = selectQuery.format(uri = uri)
+    # FIXME figure out the trusted graph cleverly
+    trustedGraph = "http://slobr.linkedmusic.org/matchDecisions/DavidLewis"
+    selectQuery = selectQuery.format(uri = uri,trustedGraph = trustedGraph)
     sparql.setQuery(selectQuery)
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
@@ -141,6 +162,26 @@ def select_segments_by_episode(episodePid):
             })
     return segments 
 
+def select_contributors(contrib):
+    app = current_app._get_current_object()
+    contributor = "VALUES ?contributor { \n"
+    for c in contrib:
+        # following weirdness is because SPARQL (or Virtuoso?) doesn't seem to like
+        # VALUES parameters with expanded URIs
+        contributor += c.replace("http://slobr.linkedmusic.org/contributors/", "contr:") + "\n"
+    contributor += "}"
+    sparql = SPARQLWrapper(app.config["ENDPOINT"])
+    sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    selectContributorsQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_contributors.rq").read()
+    selectContributorsQuery = selectContributorsQuery.format(contributor = contributor)
+    sparql.setQuery(selectContributorsQuery)
+    sparql.setReturnFormat(JSON)
+    contributorResults = sparql.query().convert()
+    contributors = dict()
+    for cR in contributorResults["results"]["bindings"]:
+        contributors[cR["contributor"]["value"]] = cR["name"]["value"]
+    return contributors
+
 def select_contributors_by_segments(segments):   
     app = current_app._get_current_object()
     segids = ""
@@ -189,6 +230,26 @@ def select_same_contributor_episodes(sourceEpisode):
         episodes.append(r["targetEpisode"]["value"])
     return episodes 
 
+def select_this_contributor_episodes(contributors):
+    app = current_app._get_current_object()
+    sparql = SPARQLWrapper(app.config["ENDPOINT"])
+    sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    selectEpisodesQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_this_contributor_episodes.rq").read()
+    contributor = "VALUES ?contributor { \n"
+    for c in contributors:
+        # following weirdness is because SPARQL (or Virtuoso?) doesn't seem to like
+        # VALUES parameters with expanded URIs
+        contributor += c.replace("http://slobr.linkedmusic.org/contributors/", "contr:") + "\n"
+    contributor += "}"
+    selectEpisodesQuery = selectEpisodesQuery.format(contributor = contributor)
+    sparql.setQuery(selectEpisodesQuery)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    episodes = list()
+    for r in results["results"]["bindings"]:
+        episodes.append(r["targetEpisode"]["value"])
+    return episodes 
+
 def select_images_by_book(books):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
@@ -206,4 +267,25 @@ def select_images_by_book(books):
     for r in results["results"]["bindings"]:
         images.append(r["image"]["value"])
     return images 
+
+def select_external_contributor(linkedbrainz):
+    app = current_app._get_current_object()
+    sparql = SPARQLWrapper(app.config["ENDPOINT"])
+    sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    selectExternalQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_external_contributor.rq").read()
+    linkedbrainz = "BIND(<" + linkedbrainz + ">as ?linkedbrainz) ."
+    selectExternalQuery = selectExternalQuery.format(linkedbrainz = linkedbrainz)
+    sparql.setQuery(selectExternalQuery)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    external = dict()
+    for r in results["results"]["bindings"]:
+        for key in r:
+            external[key] = r[key]["value"]
+#            external["image"] = r["image"]["value"]
+#            external["birth"] = r["birth"]["value"]
+#            external["death"] = r["death"]["value"]
+#            external["bio"] = r["bio"]["value"]
+
+    return external 
 

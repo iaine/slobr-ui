@@ -7,7 +7,7 @@
     </head>
     <body>
         <div id="banner">
-            <span id="banner-items">BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
+            <span id="banner-items"><a href="/">SLoBR </a>| BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
         </div>
         <div id="content">
             <div class="header">SLoBR Episode View</div>
@@ -31,7 +31,9 @@
                                         <span class="contributors"> by
                                             {% for c in segContrib[s]["contributors"] %}
                                            <span title={{ c["contributorUri"]|safe }}>  
-                                                {{ c["contributorName"] }}
+                                                <a href="/contributor?contributor={{ c["contributorUri"]|safe}}">
+                                                    {{ c["contributorName"] }}
+                                                </a>
                                            </span>
                                             {% endfor %}
                                         </span >
