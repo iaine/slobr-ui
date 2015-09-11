@@ -1,0 +1,50 @@
+{# macro to display a ?p ?o combination for this item #}
+{# it's possible that ?o is a list, if there are multiple matches #}
+{% macro unpack(payload) -%}
+    {% if payload is string %}
+        {{ payload }}
+    {% else %} {# there are multiple matches #}
+        {% for item in payload %}
+            <span> {{ item }} </span>
+        {% endfor %}
+    {% endif %} 
+{% endmacro %}
+
+<html>
+    <head>
+        <title>SLoBR Contributor View</title>
+        {% assets "scss_all" %}
+            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+        {% endassets %}
+    </head>
+    <body>
+        <div id="banner">
+            <span id="banner-items"><a href="/">SLoBR </a>| BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
+        </div>
+        <div id="content">
+            <div class="header">SLoBR Contributor View</div>
+            <div class="listing" id="work">
+               <div class="two-thirds-column left">
+                   <div class="contentblock">
+                       <div class="title">
+                           {{ unpack(contributor["rdfs:label"]) }}
+                       </div>
+                       {% if external %}
+                       <div class="bio">
+                            <img src="{{ external["image"] }}" />
+                            <div>Born: {{ external["birth"][:4] }} ({{ external["birthPlace"] }});
+                                 Died: {{ external["death"][:4] }} ({{ external["deathPlace"] }})</div>
+                            <div> {{ external["bio"] }}</div>
+                       </div>
+                       {% endif %}
+
+                   </div>
+              </div>
+               <div class="one-third-column right">
+                   <div class="explore">
+                   </div>
+               </div>
+            </div>
+        </div>
+    </body>
+</html>

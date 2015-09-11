@@ -1,0 +1,16 @@
+PREFIX po: <http://purl.org/ontology/po/>
+PREFIX slobr: <http://slobr.linkedmusic.org/terms/>
+PREFIX contr: <http://slobr.linkedmusic.org/contributors/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX bbc: <http://www.bbc.co.uk/programmes/>
+
+select distinct ?targetEpisode where {{
+    graph <http://slobr.linkedmusic.org/EMS> {{
+        {contributor}
+        ?targetSegment dct:contributor ?contributor .
+        ?targetSegEvents dct:hasPart ?targetSegment .
+        ?targetEpisode dct:hasPart ?targetSegEvents .
+    }}
+}}
+order by ?segment
+

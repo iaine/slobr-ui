@@ -1,0 +1,5 @@
+PREFIX contr: <http://slobr.linkedmusic.org/contributors/>
+select ?contributor ?name where {{
+    {contributor}
+    ?contributor rdfs:label ?name .
+}}
