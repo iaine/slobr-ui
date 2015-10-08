@@ -1,0 +1,14 @@
+PREFIX event: <http://purl.org/NET/c4dm/event.owl#>
+PREFIX blt: <http://www.bl.uk/schemas/bibliographic/blterms#>
+
+SELECT distinct ?author ?name
+where {{
+    ?publication event:time ?pubYearURI.
+    BIND(xsd:integer(SUBSTR(STR(?pubYearURI), 29)) as ?pubYear) .
+    FILTER(?pubYear > {birthYear} && ?pubYear <= {deathYear}) .
+    ?book blt:publication ?publication .
+     ?book foaf:maker ?author ;
+           rdfs:label ?pubTitle .
+     ?author rdfs:label ?name .
+}}
+order by ?name

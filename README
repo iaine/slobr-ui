@@ -1,0 +1,10 @@
+slobr-ui -- a web front-end for the data produced in the Semantic Linking of BBC Radio project.
+Python-Flask web project, using SPARQL templates to query the linked data.
+See folder app/sparql.
+
+Views include:
+    * Episodes list
+    * Individual episode detail
+    * Works view, pulling in digitised score images (if work-level alignment available)
+    * Contributor view, pulling in data from DBPedia (if Musicbrainz alignment available).
+
