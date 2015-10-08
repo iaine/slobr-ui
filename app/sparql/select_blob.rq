@@ -6,7 +6,7 @@ PREFIX salt: <http://slobr.linkedmusic.org/salt/>
 PREFIX saltset: <http://slobr.linkedmusic.org/saltsets/>
 PREFIX : <http://slobr.linkedmusic.org/>
 
-select distinct ?p ?o where {{ 
+select distinct ?uri ?p ?o where {{ 
     BIND(<{uri}> as ?this) . # our source entity
     BIND(<{trustedGraph}> as ?trustedGraph) . # the trusted match decisions
     VALUES ?contentGraphs {{ # all "dataset" graphs hardcoded here
@@ -15,20 +15,23 @@ select distinct ?p ?o where {{
     }}
     {{  # Case where there is a match decision and hence multiple matchParticipants
         graph ?trustedGraph {{ 
-            ?this (:matchParticipant/^:matchParticipant)+ ?other .
+#?this :matchParticipant/^:matchParticipant{{,3}} ?other .
+            ?this :matchParticipant ?mD .
+            ?other :matchParticipant ?mD .
+            FILTER(?this != ?other) .
         }}
         graph ?contentGraphs {{ 
-            {{ ?this ?p ?o }} UNION
-            {{ ?other ?p ?o }} .
+            {{ ?this ?p ?o . BIND(?this as ?uri) . }} UNION
+            {{ ?other ?p ?o . BIND(?other as ?uri) .}} .
         }}
     }} UNION {{ 
         # Case where there is no match decision
         ?this salt:in_saltset ?saltset .
         graph ?contentGraphs {{ 
-            ?this ?p ?o .
+            ?this ?p ?o . BIND(?this as ?uri) . 
         }}
     }}
 }}
-
+ORDER BY ?uri ?p ?o 
 
 

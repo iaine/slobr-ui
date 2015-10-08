@@ -38,9 +38,10 @@ def episode():
 def work():
     if request.args.get('workid'):
         work = select_blob(request.args.get('workid'))
+        print "______________"
+        print work
         contributors = select_contributors(work["dct:contributor"])
         print contributors 
-        print "!!!!!"
         if "dct:isPartOf" in work:
             images = select_images_by_book(work["dct:isPartOf"])
         else:
@@ -55,14 +56,15 @@ def contributor():
     if request.args.get('contributor'):
         contributor = select_blob(request.args.get('contributor'))
         external = None
+        contemporaries = None
         if "slobr:linkedbrainz_uri" in contributor:
             try: 
                 external = select_external_contributor(contributor["slobr:linkedbrainz_uri"])
-                print json.dumps(external, indent=4)
+                contemporaries = select_contemporaries(external["birth"], external["birthPlace"], external["death"], external["deathPlace"])
             except:
                 pass
-        return render_template("contributor.html", contributor=contributor, external=external)
-    else: 
+        return render_template("contributor.html", contributor=contributor, external=external, contemporaries = contemporaries)
+    else:
         return redirect(url_for('.index'))
 
 
@@ -72,16 +74,24 @@ def select_blob(uri):
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
     selectQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_blob.rq").read()
     # FIXME figure out the trusted graph cleverly
-    trustedGraph = "http://slobr.linkedmusic.org/matchDecisions/DavidLewis"
+    #trustedGraph = "http://slobr.linkedmusic.org/matchDecisions/DavidLewis"
+    trustedGraph = "http://slobr.linkedmusic.org/matchDecisions"
     selectQuery = selectQuery.format(uri = uri,trustedGraph = trustedGraph)
+    print "+++++++++++++++++++++++++++++++++++++++++++++"
+    print selectQuery
+    print "+++++++++++++++++++++++++++++++++++++++++++++"
     sparql.setQuery(selectQuery)
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
     extracted = dict()
     for r in results["results"]["bindings"]:
+        if "salt:uri" not in extracted:
+            extracted["salt:uri"] = list()
         if r["p"]["value"] not in extracted:
             extracted[r["p"]["value"]] = list()
         extracted[r["p"]["value"]].append(r["o"]["value"])
+        if r["uri"]["value"] not in extracted["salt:uri"]:
+            extracted["salt:uri"].append(r["uri"]["value"])
 
     context = { 
         "mo": "http://purl.org/ontology/mo/",
@@ -97,6 +107,9 @@ def select_blob(uri):
 
     g = Graph().parse(data=json.dumps(extracted), format="json-ld")
     blob = g.serialize(format="json-ld", auto_compact=True, context=context, indent=4)
+    print "--------------------------------"
+    print(blob)
+    print "--------------------------------"
     return json.loads(blob)
     
 def select_episodes(episodePids=None):
@@ -165,10 +178,13 @@ def select_segments_by_episode(episodePid):
 def select_contributors(contrib):
     app = current_app._get_current_object()
     contributor = "VALUES ?contributor { \n"
-    for c in contrib:
-        # following weirdness is because SPARQL (or Virtuoso?) doesn't seem to like
-        # VALUES parameters with expanded URIs
-        contributor += c.replace("http://slobr.linkedmusic.org/contributors/", "contr:") + "\n"
+    # following weirdnesses is because SPARQL (or Virtuoso?) doesn't seem to like
+    # VALUES parameters with expanded URIs
+    if isinstance(contrib, basestring):
+        contributor += contrib.replace("http://slobr.linkedmusic.org/contributors/", "contr:")  + "\n"
+    else:
+        for c in contrib:
+            contributor += c.replace("http://slobr.linkedmusic.org/contributors/", "contr:") + "\n"
     contributor += "}"
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
@@ -221,7 +237,6 @@ def select_same_contributor_episodes(sourceEpisode):
     selectContributorsQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_same_contributor_episodes.rq").read()
     sourceEpisode = "BIND(<" + sourceEpisode + "> as ?sourceEpisode) ."
     selectContributorsQuery = selectContributorsQuery.format(sourceEpisode = sourceEpisode)
-    print selectContributorsQuery
     sparql.setQuery(selectContributorsQuery)
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
@@ -239,7 +254,7 @@ def select_this_contributor_episodes(contributors):
     for c in contributors:
         # following weirdness is because SPARQL (or Virtuoso?) doesn't seem to like
         # VALUES parameters with expanded URIs
-        contributor += c.replace("http://slobr.linkedmusic.org/contributors/", "contr:") + "\n"
+        contributor += "<" + c + ">\n"
     contributor += "}"
     selectEpisodesQuery = selectEpisodesQuery.format(contributor = contributor)
     sparql.setQuery(selectEpisodesQuery)
@@ -265,7 +280,8 @@ def select_images_by_book(books):
     results = sparql.query().convert()
     images = list()
     for r in results["results"]["bindings"]:
-        images.append(r["image"]["value"])
+        #TODO FIXME ugly hack to take care of EMO ridiculousness -- fix in the triples once this is confirmed as permanent
+        images.append(r["image"]["value"].replace("digirep.rhul.ac.uk", "repository.royalholloway.ac.uk"))
     return images 
 
 def select_external_contributor(linkedbrainz):
@@ -276,16 +292,35 @@ def select_external_contributor(linkedbrainz):
     linkedbrainz = "BIND(<" + linkedbrainz + ">as ?linkedbrainz) ."
     selectExternalQuery = selectExternalQuery.format(linkedbrainz = linkedbrainz)
     sparql.setQuery(selectExternalQuery)
+    print selectExternalQuery
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
     external = dict()
     for r in results["results"]["bindings"]:
         for key in r:
             external[key] = r[key]["value"]
-#            external["image"] = r["image"]["value"]
-#            external["birth"] = r["birth"]["value"]
-#            external["death"] = r["death"]["value"]
-#            external["bio"] = r["bio"]["value"]
-
     return external 
 
+def select_contemporaries(birthYear, birthPlace, deathYear, deathPlace):
+    # return books that were published between (a composer's) birthYear and deathYear
+    # in either their birthPlace or their deathPlace (??)
+    # along with information on those books' authors
+    app = current_app._get_current_object()
+    sparql = SPARQLWrapper(app.config["ENDPOINT"])
+    sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    selectContemporariesQuery= open(app.config["SLOBR_QUERY_DIR"] + "select_contemporaries.rq").read()
+    selectContemporariesQuery = selectContemporariesQuery.format(
+        birthYear = birthYear[:4],
+        deathYear = deathYear[:4]
+    )
+    sparql.setQuery(selectContemporariesQuery)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    contemporaries = list()
+    for r in results["results"]["bindings"]:
+        c = dict()
+        for key in r:
+            c[key] = r[key]["value"]
+        contemporaries.append(c)
+    return contemporaries 
+         

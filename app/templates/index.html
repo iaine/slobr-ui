@@ -4,10 +4,13 @@
         {% assets "scss_all" %}
             <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
         {% endassets %}
+        <script src="{{url_for('static', filename='jquery.min.js') }}" type="text/javascript"></script>
+        <script src="{{url_for('static', filename='jquery.lazyload.js')}}" type="text/javascript"></script>
+        <script type="text/javascript">$("img.lazy").lazyload({ container: "#scoreimages" });</script>
     </head>
     <body>
         <div id="banner">
-            <span id="banner-items"><a href="/">SLoBR </a>| BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
+            <span id="banner-items"><a href="/"><span>S</span><span>L</span><span>o</span><span>B</span><span>R</span></a> Semantic Linking of BBC Radio</span>
         </div>
         <div id="content">
             <div class="header">SLoBR Episodes Listing</div>
@@ -16,7 +19,7 @@
                <div class="list-item">
                    <a href="episode?pid={{ episode["pid"]|safe }}">
                        <div class="one-third-column left">
-                           <img src="http://ichef.bbci.co.uk/images/ic/240x135/{{ episode["image"] }}.jpg"/>
+                           <img class="lazy" data-original="http://ichef.bbci.co.uk/images/ic/240x135/{{ episode["image"] }}.jpg">
                        </div>
                        <div class="two-thirds-column right">
                            <div class="title" title="{{ episode["pid"]|safe }}">{{ episode["title"]|safe }}</div>

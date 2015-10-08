@@ -5,11 +5,16 @@
         {{ payload }}
     {% else %} {# there are multiple matches #}
         {% for item in payload %}
-            <span> {{ item }} </span>
+            <span>{{ item }}</span>{% if not loop.last %}; {% endif %}
         {% endfor %}
     {% endif %} 
 {% endmacro %}
 
+{% macro first(thing) -%}
+    {% if thing is string %}{{ thing | safe}}
+    {% else %}{{ thing[0] | safe}}
+    {% endif %}
+{% endmacro %}
 <html>
     <head>
         <title>SLoBR Contributor View</title>
@@ -19,7 +24,7 @@
     </head>
     <body>
         <div id="banner">
-            <span id="banner-items"><a href="/">SLoBR </a>| BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
+            <span id="banner-items"><a href="/"><span>S</span><span>L</span><span>o</span><span>B</span><span>R</span></a> Semantic Linking of BBC Radio</span>
         </div>
         <div id="content">
             <div class="header">SLoBR Contributor View</div>
@@ -29,6 +34,11 @@
                        <div class="title">
                            {{ unpack(contributor["rdfs:label"]) }}
                        </div>
+                       {% if contributor["slobr:contributor_role"] %}
+                       <div class="roles">
+                           {{ unpack(contributor["slobr:contributor_role"]) }}
+                       </div>
+                       {% endif %}
                        {% if external %}
                        <div class="bio">
                             <img src="{{ external["image"] }}" />
@@ -42,6 +52,24 @@
               </div>
                <div class="one-third-column right">
                    <div class="explore">
+                       Explore:
+                       <hr>
+                       <a href=episodes?contributor={{first(contributor["salt:uri"])}}>All episodes featuring this composer</a>
+                       <hr>
+                       <a href=episodes?contributor>Episodes featuring contemporary composers</a>
+                       <hr>
+                       {% if contemporaries %}
+                           Contemporaries - composers with work published during this person's lifetime:
+                           <div class="contemporaries">
+                               <ul>
+                               {% for c in contemporaries %}
+                                   <li> <a href="/contributor?contributor={{ c["author"] }}">
+                                        {{ c["name"] }}. </a>
+                                   </li>
+                               {% endfor %}
+                              </ul>
+                           </div>
+                       {% endif %}
                    </div>
                </div>
             </div>

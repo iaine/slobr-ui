@@ -5,20 +5,36 @@ $full-page-width: 1008px;
 $full-col-width: $full-page-width - $page-margin;
 $one-third-col-width:$full-col-width/3 - $gutter-width/2;
 $two-thirds-col-width:2*($full-col-width/3) - $gutter-width/2;
-
 $text-color: #ccc;
+$bgcolor: #933;
+$bghighlight: #a55;
+$bghighlighttext: #300;
 
 body {
   font: 100% $font-stack;
 }
 
+.mfp-img { 
+    max-height: 750!important; // hack
+}
+
 #banner { 
   width: 100%;
-  background: #333;
+  background: #633;
  
   a { 
     color:#fff;
     text-decoration:none; 
+    span { 
+        color:#fff;
+        padding-left: .25em;
+        padding-right: .25em;
+        margin-right:0.2em;
+        font-family: monospace;
+        font-size: 1.5em;
+        margin-bottom:0.1em;
+        background:#000;
+    }
   }
 
   #banner-items { 
@@ -36,15 +52,17 @@ body {
   margin-left: $page-margin/2;
   width:$full-col-width;
   color:$text-color;
-
-  #scoreimages { 
-      img { 
-          width: $two-thirds-col-width - 20px; // leave space for scrollbar
-          padding-top:5px;
-          padding-bottom:5;
-      }
-      height: 550px;
+  
+  #scoreimagesWrapper { 
+      height: 540px;
       overflow:auto;
+      #scoreimages { 
+          img { 
+              width: $two-thirds-col-width - 20px; // leave space for scrollbar
+              padding-top:5px;
+              padding-bottom:5;
+          }
+      }
   }
 
   .bio img { 
@@ -52,6 +70,18 @@ body {
     padding:15px;
     max-width: $two-thirds-col-width -30; // leave space for padding
     max-height: 400px;
+  }
+
+  .contemporaries { 
+     height:473px;
+     overflow:auto;
+     background:$bghighlight;
+     margin-left: $gutter-width;
+     margin-right: $gutter-width;
+     color:$bghighlighttext;
+     a { 
+         color:$bghighlighttext;
+     }   
   }
 
   a { 
@@ -62,7 +92,7 @@ body {
   .header {
     padding-left: 10px; 
     color:#fff;  
-    background:#933;
+    background:$bgcolor;
   }
   
   .title { 
@@ -80,12 +110,12 @@ body {
 
   .one-third-column { 
       width:$one-third-col-width;
-      background:#933;
+      background:$bgcolor;
   }
 
   .two-thirds-column { 
       width:$two-thirds-col-width;
-      background:#933;
+      background:$bgcolor;
   }
 
   .left { 

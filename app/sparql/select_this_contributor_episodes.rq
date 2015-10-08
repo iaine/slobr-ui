@@ -1,5 +1,6 @@
 PREFIX po: <http://purl.org/ontology/po/>
 PREFIX slobr: <http://slobr.linkedmusic.org/terms/>
+PREFIX slick: <http://slickmem.data.t-mus.org/>
 PREFIX contr: <http://slobr.linkedmusic.org/contributors/>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX bbc: <http://www.bbc.co.uk/programmes/>

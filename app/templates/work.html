@@ -5,7 +5,7 @@
         {{ payload }}
     {% else %} {# there are multiple matches #}
         {% for item in payload %}
-            <span> {{ item }} </span>
+            <span>{{ item }}</span>{% if not loop.last %}; {% endif %}
         {% endfor %}
     {% endif %} 
 {% endmacro %}
@@ -16,10 +16,11 @@
         {% assets "scss_all" %}
             <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
         {% endassets %}
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='magnific-popup.css')}}">
     </head>
     <body>
         <div id="banner">
-            <span id="banner-items"><a href="/">SLoBR </a>| BBC MAIN BANNER GOES HERE | NEWS | SPORTS | WEATHER | FALAFEL RECIPES | TV | RADIO | IPLAYER | SEARCH</span>
+            <span id="banner-items"><a href="/"><span>S</span><span>L</span><span>o</span><span>B</span><span>R</span></a> Semantic Viewer: Semantic Linking of BBC Radio</span>
         </div>
         <div id="content">
             <div class="header">SLoBR Work View</div>
@@ -42,21 +43,48 @@
                        {{ unpack(work["mo:recorded_as"]) }}
                        </div>
                    </div>
-                   <div id="scoreimages">
-                       {% if images is iterable %}
-                           {% for image in images %}
-                                {% if loop.index < 10 %} {# only show first 10 images for now as they are pretty huge - in future, do better with diva.js #}
-                                  <img src={{ image }}/>
-                                {% endif %}
-                           {% endfor %}
-                       {% endif %}
+                   <div id="scoreimagesWrapper">
+                       <div id="scoreimages">
+                           {% if images is iterable %}
+                               {% for image in images %}
+                               <a href="{{image}}" target="_blank"><img class="lazy" data-original="{{ image }}" /></a>
+                               {% endfor %}
+                           {% endif %}
+                       </div>
                    </div>
               </div>
                <div class="one-third-column right">
                    <div class="explore">
+                       Explore:
+                       <hr>
                        {# there may be more than one contributor #}
                        {% if work["dct:contributor"] is string %}
-                       <a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring these contributors</a>
+                       This work's composer
+                       <hr>
+                       <a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring this work</a><br/>
+                       <hr>
+                       <a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring this composer</a>
+                       <hr>
+                       <a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring contemporary works</a>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
+                       <br/>
                        {% else %}
                        <a href=episodes?contributor={{work["dct:contributor"]|join("|") }}>All episodes featuring these contributors</a>
                        {% endif %}
@@ -65,5 +93,19 @@
                </div>
             </div>
         </div>
+        <script src="{{url_for('static', filename='jquery.min.js') }}" type="text/javascript"></script>
+        <script src="{{url_for('static', filename='jquery.magnific-popup.min.js') }}" type="text/javascript"></script>
+        <script src="{{url_for('static', filename='jquery.lazyload.js')}}" type="text/javascript"></script>
+        <script type="text/javascript">
+            $("img.lazy").lazyload({ container: "#scoreimages", threshold:200 });
+            $(document).ready(function() {
+                $('#scoreimages').magnificPopup({
+                    type:'image',
+                    delegate: 'a',
+                    verticalFit: true,
+                    gallery:{enabled:true}
+                });
+            });
+        </script>
     </body>
 </html>
