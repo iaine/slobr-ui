@@ -5,8 +5,6 @@
             <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
         {% endassets %}
         <script src="{{url_for('static', filename='jquery.min.js') }}" type="text/javascript"></script>
-        <script src="{{url_for('static', filename='jquery.lazyload.js')}}" type="text/javascript"></script>
-        <script type="text/javascript">$("img.lazy").lazyload({ container: "#scoreimages" });</script>
     </head>
     <body>
         <div id="banner">
@@ -19,7 +17,7 @@
                <div class="list-item">
                    <a href="episode?pid={{ episode["pid"]|safe }}">
                        <div class="one-third-column left">
-                           <img class="lazy" data-original="http://ichef.bbci.co.uk/images/ic/240x135/{{ episode["image"] }}.jpg">
+                           <img src="http://ichef.bbci.co.uk/images/ic/240x135/{{ episode["image"] }}.jpg">
                        </div>
                        <div class="two-thirds-column right">
                            <div class="title" title="{{ episode["pid"]|safe }}">{{ episode["title"]|safe }}</div>
