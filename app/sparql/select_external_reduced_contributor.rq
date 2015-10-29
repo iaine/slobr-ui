@@ -1,0 +1,18 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dbp: <http://dbpedia.org/ontology/>
+select ?birth ?birthPlace ?death ?deathPlace ?image ?bio
+where  {{ 
+    {linkedbrainz} 
+    SERVICE <http://linkedbrainz.org/sparql> {{
+            ?linkedbrainz owl:sameAs ?dbpedia .
+    }}
+    SERVICE <http://dbpedia.org/sparql> {{
+              ?dbpedia  dbp:birthDate ?birth ;
+                        dbp:deathDate ?death ;
+                        foaf:depiction ?image ;
+                        dbp:abstract ?bio .
+              FILTER(langMatches(lang(?bio), "en")) .
+    }}
+}}
+
+

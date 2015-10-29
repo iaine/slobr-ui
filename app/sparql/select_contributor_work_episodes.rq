@@ -1,0 +1,19 @@
+PREFIX po: <http://purl.org/ontology/po/>
+PREFIX slobr: <http://slobr.linkedmusic.org/terms/>
+PREFIX dct: <http://purl.org/dc/terms/>
+
+select distinct ?episode ?segment ?title ?date where {{
+    graph <http://slobr.linkedmusic.org/EMS> {{
+        ?segment a po:MusicSegment ;
+            dct:contributor <{contributor}>;
+            dct:title ?title .
+        ?segEvents a slobr:SegmentEvents ; 
+            dct:hasPart ?segment .
+        ?episode a po:Episode; 
+            dct:hasPart ?segEvents ;
+            dct:date ?date .
+    }}
+}}
+order by ?title
+
+
