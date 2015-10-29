@@ -21,6 +21,8 @@
         {% assets "scss_all" %}
             <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
         {% endassets %}
+        <script type="text/javascript" src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='all.js') }}"></script>
     </head>
     <body>
         <div id="banner">
