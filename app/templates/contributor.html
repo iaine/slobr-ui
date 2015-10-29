@@ -42,8 +42,15 @@
                        {% if external %}
                        <div class="bio">
                             <img src="{{ external["image"] }}" />
-                            <div>Born: {{ external["birth"][:4] }} ({{ external["birthPlace"] }});
-                                 Died: {{ external["death"][:4] }} ({{ external["deathPlace"] }})</div>
+                            <div>Born: {{ external["birth"][:4] }} 
+                                {% if "birthPlace" in external %}
+                                    ({{ external["birthPlace"] }});
+                                {% endif %}
+                                 Died: {{ external["death"][:4] }} 
+                                {% if "deathPlace" in external %}
+                                    ({{ external["deathPlace"] }})
+                                {% endif %}
+                            </div>
                             <div> {{ external["bio"] }}</div>
                        </div>
                        {% endif %}
@@ -56,9 +63,24 @@
                        <hr>
                        <a href=episodes?contributor={{first(contributor["salt:uri"])}}>All episodes featuring this composer</a>
                        <hr>
-                       <!--
-                       <a href=episodes?contributor>Episodes featuring contemporary composers</a>
-                       <hr>-->
+                       Works by this composer featured on the show:
+                       <div class="composerWorks">
+                           {% for w in works %}
+                            <div>
+                                <span class="title">
+                                    <a href="/work?workid={{ w["segment"] }}">
+                                        {{ w["title"] }}
+                                    </a>    
+                                </span>
+                                <span class="date">
+                                    <a href="/episode?pid={{ w["episode"] }}">
+                                        ({{ w["date"][:10] }})
+                                    </a>
+                                </span>
+                            </div>
+                           {% endfor %}
+                          </ul>
+                       </div>
                        {% if contemporaries %}
                            Contemporaries - composers with work published during this person's lifetime:
                            <div class="contemporaries">

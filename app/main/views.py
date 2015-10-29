@@ -38,14 +38,15 @@ def episode():
 def work():
     if request.args.get('workid'):
         work = select_blob(request.args.get('workid'))
-        print "______________"
-        print work
+        print "Got work:"
+        print json.dumps(work, indent=4)
         contributors = select_contributors(work["dct:contributor"])
         print contributors 
         if "dct:isPartOf" in work:
             images = select_images_by_book(work["dct:isPartOf"])
         else:
             images = None
+        print "Got back work:"
         print json.dumps(work, indent=4)
         return render_template("work.html", work = work, images = images, contributors = contributors)
     else:
@@ -55,15 +56,25 @@ def work():
 def contributor():
     if request.args.get('contributor'):
         contributor = select_blob(request.args.get('contributor'))
+        works = select_contributor_work_episodes(request.args.get('contributor'))
+        print "Got back contributor:"
+        print json.dumps(contributor, indent=4)
         external = None
         contemporaries = None
+        mbz = None
         if "slobr:linkedbrainz_uri" in contributor:
+            mbz = contributor["slobr:linkedbrainz_uri"]
+        elif "mo:musicbrainz_guid" in contributor:
+            mbz = contributor["mo:musibrainz_guid" + "#_"]
+        if mbz:
             try: 
-                external = select_external_contributor(contributor["slobr:linkedbrainz_uri"])
-                contemporaries = select_contemporaries(external["birth"], external["birthPlace"], external["death"], external["deathPlace"])
+                external = select_external_contributor(mbz, reduced = False)
+                if not external:
+                    external = select_external_contributor(mbz, reduced = True)
+                contemporaries = select_contemporaries(external["birth"], external["death"])
             except:
                 pass
-        return render_template("contributor.html", contributor=contributor, external=external, contemporaries = contemporaries)
+        return render_template("contributor.html", contributor=contributor, external=external, contemporaries = contemporaries, works = works)
     else:
         return redirect(url_for('.index'))
 
@@ -284,11 +295,15 @@ def select_images_by_book(books):
         images.append(r["image"]["value"].replace("digirep.rhul.ac.uk", "repository.royalholloway.ac.uk"))
     return images 
 
-def select_external_contributor(linkedbrainz):
+def select_external_contributor(linkedbrainz, reduced):
+    if reduced: # try to get just the most basic details (birth/death dates, depiction, bio)
+        template = "select_external_reduced_contributor.rq"
+    else:
+        template = "select_external_contributor.rq"
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
-    selectExternalQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_external_contributor.rq").read()
+    selectExternalQuery = open(app.config["SLOBR_QUERY_DIR"] + template).read()
     linkedbrainz = "BIND(<" + linkedbrainz + ">as ?linkedbrainz) ."
     selectExternalQuery = selectExternalQuery.format(linkedbrainz = linkedbrainz)
     sparql.setQuery(selectExternalQuery)
@@ -301,9 +316,8 @@ def select_external_contributor(linkedbrainz):
             external[key] = r[key]["value"]
     return external 
 
-def select_contemporaries(birthYear, birthPlace, deathYear, deathPlace):
+def select_contemporaries(birthYear, deathYear):
     # return books that were published between (a composer's) birthYear and deathYear
-    # in either their birthPlace or their deathPlace (??)
     # along with information on those books' authors
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
@@ -323,4 +337,22 @@ def select_contemporaries(birthYear, birthPlace, deathYear, deathPlace):
             c[key] = r[key]["value"]
         contemporaries.append(c)
     return contemporaries 
-         
+ 
+def select_contributor_work_episodes(contributor):
+    app = current_app._get_current_object()
+    sparql = SPARQLWrapper(app.config["ENDPOINT"])
+    sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    selectContributorWorksQuery= open(app.config["SLOBR_QUERY_DIR"] + "select_contributor_work_episodes.rq").read()
+    selectContributorWorksQuery = selectContributorWorksQuery.format(
+        contributor = contributor
+    )
+    sparql.setQuery(selectContributorWorksQuery)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    contributerWorks = list()
+    for r in results["results"]["bindings"]:
+        c = dict()
+        for key in r:
+            c[key] = r[key]["value"]
+        contributerWorks.append(c)
+    return contributerWorks 

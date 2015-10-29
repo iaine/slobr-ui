@@ -39,8 +39,9 @@
                        {% endfor %}
                        </div>
                        <div>
-                       Recorded as:
-                       {{ unpack(work["mo:recorded_as"]) }}
+                       Recorded as:<a href="{{work["mo:recorded_as"]}}">
+                           {{ work["mo:recorded_as"] }}
+                        </a>
                        </div>
                    </div>
                    <div id="scoreimagesWrapper">
@@ -59,33 +60,13 @@
                        <hr>
                        {# there may be more than one contributor #}
                        {% if work["dct:contributor"] is string %}
-                       This work's composer
-                       <hr>
-                       <a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring this work</a><br/>
+                       <a href=contributor?contributor={{work["dct:contributor"]}}> This work's composer </a>
+                       <!--<hr>
+                                             <a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring this work</a><br/>   -->
                        <hr>
                        <a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring this composer</a>
-                       <hr>
-                       <a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring contemporary works</a>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       <br/>
-                       {% else %}
+                       <!--<a href=episodes?contributor={{work["dct:contributor"] }}>All episodes featuring contemporary works</a> -->
+                      {% else %}
                        <a href=episodes?contributor={{work["dct:contributor"]|join("|") }}>All episodes featuring these contributors</a>
                        {% endif %}
                    </div>
