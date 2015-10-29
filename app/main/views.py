@@ -83,6 +83,7 @@ def select_blob(uri):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_blob.rq").read()
     # FIXME figure out the trusted graph cleverly
     #trustedGraph = "http://slobr.linkedmusic.org/matchDecisions/DavidLewis"
@@ -127,6 +128,7 @@ def select_episodes(episodePids=None):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectEpisodesQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_episodes.rq").read()
     if episodePids is None:
         selectEpisodesQuery = selectEpisodesQuery.format(uri = "")
@@ -171,6 +173,7 @@ def select_segments_by_episode(episodePid):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectSegmentsQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_segments_by_episode.rq").read()
     selectSegmentsQuery = selectSegmentsQuery.format(uri = "BIND(<" + episodePid + "> as ?uri) .")
     sparql.setQuery(selectSegmentsQuery)
@@ -199,6 +202,7 @@ def select_contributors(contrib):
     contributor += "}"
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectContributorsQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_contributors.rq").read()
     selectContributorsQuery = selectContributorsQuery.format(contributor = contributor)
     sparql.setQuery(selectContributorsQuery)
@@ -220,6 +224,7 @@ def select_contributors_by_segments(segments):
         return None # some episodes don't have segments
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectContributorsQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_contributors_by_segments.rq").read()
     selectContributorsQuery = selectContributorsQuery.format(segments=segids)
     sparql.setQuery(selectContributorsQuery)
@@ -245,6 +250,7 @@ def select_same_contributor_episodes(sourceEpisode):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectContributorsQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_same_contributor_episodes.rq").read()
     sourceEpisode = "BIND(<" + sourceEpisode + "> as ?sourceEpisode) ."
     selectContributorsQuery = selectContributorsQuery.format(sourceEpisode = sourceEpisode)
@@ -260,6 +266,7 @@ def select_this_contributor_episodes(contributors):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectEpisodesQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_this_contributor_episodes.rq").read()
     contributor = "VALUES ?contributor { \n"
     for c in contributors:
@@ -280,6 +287,7 @@ def select_images_by_book(books):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectImagesQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_images_by_book.rq").read()
     b = "VALUES ?book { \n" 
     for book in books:
@@ -303,6 +311,7 @@ def select_external_contributor(linkedbrainz, reduced):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectExternalQuery = open(app.config["SLOBR_QUERY_DIR"] + template).read()
     linkedbrainz = "BIND(<" + linkedbrainz + ">as ?linkedbrainz) ."
     selectExternalQuery = selectExternalQuery.format(linkedbrainz = linkedbrainz)
@@ -322,6 +331,7 @@ def select_contemporaries(birthYear, deathYear):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectContemporariesQuery= open(app.config["SLOBR_QUERY_DIR"] + "select_contemporaries.rq").read()
     selectContemporariesQuery = selectContemporariesQuery.format(
         birthYear = birthYear[:4],
@@ -342,6 +352,7 @@ def select_contributor_work_episodes(contributor):
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
     sparql.setCredentials(user = app.config["SPARQLUSER"], passwd = app.config["SPARQLPASSWORD"])
+    sparql.setTimeout(3)
     selectContributorWorksQuery= open(app.config["SLOBR_QUERY_DIR"] + "select_contributor_work_episodes.rq").read()
     selectContributorWorksQuery = selectContributorWorksQuery.format(
         contributor = contributor
