@@ -64,27 +64,29 @@
                        Explore:
                        <hr>
                        <a href=episodes?contributor={{first(contributor["salt:uri"])}}>All episodes featuring this composer</a>
-                       <hr>
-                       Works by this composer featured on the show:
-                       <div class="composerWorks">
-                           {% for w in works %}
-                            <div>
-                                <span class="title">
-                                    <a href="/work?workid={{ w["segment"] }}">
-                                        {{ w["title"] }}
-                                    </a>    
-                                </span>
-                                <span class="date">
-                                    <a href="/episode?pid={{ w["episode"] }}">
-                                        ({{ w["date"][:10] }})
-                                    </a>
-                                </span>
-                            </div>
-                           {% endfor %}
-                          </ul>
-                       </div>
+                       {% if works %}
+                           <hr/>
+                           Works by this composer featured on the show:
+                           <div class="composerWorks">
+                               {% for w in works %}
+                                <div>
+                                    <span class="title">
+                                        <a href="/work?workid={{ w["segment"] }}">
+                                            {{ w["title"] }}
+                                        </a>    
+                                    </span>
+                                    <span class="date">
+                                        <a href="/episode?pid={{ w["episode"] }}">
+                                            ({{ w["date"][:10] }})
+                                        </a>
+                                    </span>
+                                </div>
+                               {% endfor %}
+                              </ul>
+                           </div>
+                       {% endif %}
                        {% if contemporaries %}
-                       <hr/>
+                           <hr/>
                            Contemporaries - composers with work published during this person's lifetime:
                            <div class="contemporaries">
                                <ul>

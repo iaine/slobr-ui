@@ -56,12 +56,19 @@ def work():
 def contributor():
     if request.args.get('contributor'):
         contributor = select_blob(request.args.get('contributor'))
-        works = select_contributor_work_episodes(request.args.get('contributor'))
-        print "Got back contributor:"
-        print json.dumps(contributor, indent=4)
+        emsuri = None
         external = None
         contemporaries = None
         mbz = None
+        works = None
+        print "Got back contributor:"
+        print json.dumps(contributor, indent=4)
+        #find the EMS uri
+        for uri in contributor["salt:uri"]: 
+            if uri.startswith("http://slobr.linkedmusic.org"):
+                emsuri = uri
+        if emsuri:
+            works = select_contributor_work_episodes(emsuri)
         if "slobr:linkedbrainz_uri" in contributor:
             mbz = contributor["slobr:linkedbrainz_uri"]
         elif "mo:musicbrainz_guid" in contributor:
