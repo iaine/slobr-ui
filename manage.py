@@ -5,6 +5,7 @@ from flask.ext.script import Manager, Shell
 from flask.ext.socketio import emit
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
+app.debug=False
 socketio = create_socketio(app)
 #handlers = get_websocket_handlers()
 manager = Manager(app)

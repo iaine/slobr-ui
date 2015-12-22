@@ -78,7 +78,9 @@ def contributor():
                 external = select_external_contributor(mbz, reduced = False)
                 if not external:
                     external = select_external_contributor(mbz, reduced = True)
+                print json.dumps(external, indent=4)
                 contemporaries = select_contemporaries(external["birth"], external["death"])
+
             except:
                 pass
         return render_template("contributor.html", contributor=contributor, external=external, contemporaries = contemporaries, works = works)
@@ -93,8 +95,8 @@ def select_blob(uri):
     sparql.setTimeout(3)
     selectQuery = open(app.config["SLOBR_QUERY_DIR"] + "select_blob.rq").read()
     # FIXME figure out the trusted graph cleverly
-    #trustedGraph = "http://slobr.linkedmusic.org/matchDecisions/DavidLewis"
-    trustedGraph = "http://slobr.linkedmusic.org/matchDecisions"
+    trustedGraph = "http://slobr.linkedmusic.org/matchDecisions/DavidLewis"
+    #trustedGraph = "http://slobr.linkedmusic.org/matchDecisions"
     selectQuery = selectQuery.format(uri = uri,trustedGraph = trustedGraph)
     print "+++++++++++++++++++++++++++++++++++++++++++++"
     print selectQuery
@@ -312,8 +314,10 @@ def select_images_by_book(books):
 
 def select_external_contributor(linkedbrainz, reduced):
     if reduced: # try to get just the most basic details (birth/death dates, depiction, bio)
+        print "reduced"
         template = "select_external_reduced_contributor.rq"
     else:
+        print "not reduced"
         template = "select_external_contributor.rq"
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
@@ -322,6 +326,7 @@ def select_external_contributor(linkedbrainz, reduced):
     selectExternalQuery = open(app.config["SLOBR_QUERY_DIR"] + template).read()
     linkedbrainz = "BIND(<" + linkedbrainz + ">as ?linkedbrainz) ."
     selectExternalQuery = selectExternalQuery.format(linkedbrainz = linkedbrainz)
+    print "External query: "+ selectExternalQuery
     sparql.setQuery(selectExternalQuery)
     print selectExternalQuery
     sparql.setReturnFormat(JSON)

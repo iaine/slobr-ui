@@ -15,9 +15,9 @@ select distinct ?uri ?p ?o where {{
     }}
     {{  # Case where there is a match decision and hence multiple matchParticipants
         graph ?trustedGraph {{ 
-#?this :matchParticipant/^:matchParticipant{{,3}} ?other .
-            ?this :matchParticipant ?mD .
-            ?other :matchParticipant ?mD .
+            ?this :matchParticipant/^:matchParticipant{{,3}} ?other .
+#            ?this :matchParticipant ?mD .
+#            ?other :matchParticipant ?mD .
             FILTER(?this != ?other) .
         }}
         graph ?contentGraphs {{ 

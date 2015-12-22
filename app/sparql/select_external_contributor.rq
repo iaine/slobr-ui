@@ -3,7 +3,7 @@ PREFIX dbp: <http://dbpedia.org/ontology/>
 select ?birth ?birthPlace ?death ?deathPlace ?image ?bio
 where  {{ 
     {linkedbrainz} 
-    SERVICE <http://linkedbrainz.org/sparql> {{
+    graph <http://slobr.linkedmusic.org/lbz_dbp> {{
             ?linkedbrainz owl:sameAs ?dbpedia .
     }}
     SERVICE <http://dbpedia.org/sparql> {{
