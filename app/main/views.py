@@ -97,7 +97,7 @@ def select_blob(uri):
     # FIXME figure out the trusted graph cleverly
     trustedGraph = "http://slobr.linkedmusic.org/matchDecisions/DavidLewis"
     #trustedGraph = "http://slobr.linkedmusic.org/matchDecisions"
-    selectQuery = selectQuery.format(uri = uri,trustedGraph = trustedGraph)
+    selectQuery = selectQuery.format(sourceUri = uri,trustedGraph = trustedGraph)
 #    print selectQuery
     sparql.setQuery(selectQuery)
     sparql.setReturnFormat(JSON)
