@@ -4,11 +4,10 @@ PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX bbc: <http://www.bbc.co.uk/programmes/>
 
 select distinct ?segment ?title ?contributor ?name where {{
+		VALUES ?segment  {{
+				{segments}
+		}} .
     graph <http://slobr.linkedmusic.org/EMS> {{
-        VALUES ?segment  {{
-            {segments}
-        }} .
-
         ?segment dct:contributor ?contributor ;
             dct:title ?title .
         ?contributor rdfs:label ?name .

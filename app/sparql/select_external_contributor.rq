@@ -7,17 +7,19 @@ where  {{
             ?linkedbrainz owl:sameAs ?dbpedia .
     }}
     SERVICE <http://dbpedia.org/sparql/> {{
-              ?dbpedia  dbp:birthDate ?birth ;
-                        dbp:birthPlace ?birthP ;
-                        dbp:deathDate ?death ;
-                        dbp:deathPlace ?deathP ;
-                        foaf:depiction ?image ;
-                        dbp:abstract ?bio .
-              ?birthP rdfs:label ?birthPlace .
-              ?deathP rdfs:label ?deathPlace .
-              FILTER(langMatches(lang(?birthPlace), "en")) .
-              FILTER(langMatches(lang(?deathPlace), "en")) .
+							?dbpedia dbp:abstract ?bio ; 
+											 dbp:depiction ?image .
               FILTER(langMatches(lang(?bio), "en")) .
+							OPTIONAL { 
+									?dbpedia  dbp:birthDate ?birth ;
+														dbp:birthPlace ?birthP ;
+														dbp:deathDate ?death ;
+														dbp:deathPlace ?deathP .
+									?birthP rdfs:label ?birthPlace .
+									?deathP rdfs:label ?deathPlace .
+									FILTER(langMatches(lang(?birthPlace), "en")) .
+									FILTER(langMatches(lang(?deathPlace), "en")) .
+							}
     }}
 }}
 

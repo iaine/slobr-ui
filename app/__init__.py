@@ -2,7 +2,6 @@ import sys
 from flask import Flask, current_app
 from config import config
 from flask.ext import assets
-from flask.ext.socketio import SocketIO
 from SPARQLWrapper import SPARQLWrapper, JSON, POST
 
 def create_app(config_name):
@@ -22,5 +21,3 @@ def create_app(config_name):
 
     return app
 
-def create_socketio(app):
-    return SocketIO(app)

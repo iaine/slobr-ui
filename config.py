@@ -14,7 +14,7 @@ class DevelopmentConfig(Config):
     BASE_URI = "http://slobr.linkedmusic.org/" # default virtuoso port
     SPARQLUSER = "slobr"
     SPARQLPASSWORD = "slobr"
-    ENDPOINT = "http://127.0.0.1:8890/sparql" # default virtuoso endpoint location
+    ENDPOINT = "http://www.linkedmusic.org/sparql" # default virtuoso endpoint location
     USER = "slobr",
     SASS = basedir + "/app/sass/"
     SLOBR_QUERY_DIR = basedir + "/app/sparql/"

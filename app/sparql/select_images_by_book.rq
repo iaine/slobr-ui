@@ -2,10 +2,11 @@ PREFIX po: <http://purl.org/ontology/po/>
 PREFIX slobr: <http://slobr.linkedmusic.org/terms/>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX bbc: <http://www.bbc.co.uk/programmes/>
+PREFIX bibo: <http://purl.org/ontology/bibo/>
 
 select distinct ?image where {{
+		{book}
     graph <http://slobr.linkedmusic.org/SLICKMEM> {{
-        {book}
         ?book a bibo:Book ; 
             foaf:depiction ?image .
     }}

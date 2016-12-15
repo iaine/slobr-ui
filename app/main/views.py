@@ -38,16 +38,16 @@ def episode():
 def work():
     if request.args.get('workid'):
         work = select_blob(request.args.get('workid'))
-        print "Got work:"
-        print json.dumps(work, indent=4)
+#        print "Got work:"
+#        print json.dumps(work, indent=4)
         contributors = select_contributors(work["dct:contributor"])
-        print contributors 
+#        print contributors 
         if "dct:isPartOf" in work:
             images = select_images_by_book(work["dct:isPartOf"])
         else:
             images = None
-        print "Got back work:"
-        print json.dumps(work, indent=4)
+#        print "Got back work:"
+#        print json.dumps(work, indent=4)
         return render_template("work.html", work = work, images = images, contributors = contributors)
     else:
         return redirect(url_for('.index'))
@@ -61,8 +61,8 @@ def contributor():
         contemporaries = None
         mbz = None
         works = None
-        print "Got back contributor:"
-        print json.dumps(contributor, indent=4)
+#        print "Got back contributor:"
+#        print json.dumps(contributor, indent=4)
         #find the EMS uri
         for uri in contributor["salt:uri"]: 
             if uri.startswith("http://slobr.linkedmusic.org"):
@@ -78,7 +78,7 @@ def contributor():
                 external = select_external_contributor(mbz, reduced = False)
                 if not external:
                     external = select_external_contributor(mbz, reduced = True)
-                print json.dumps(external, indent=4)
+#                print json.dumps(external, indent=4)
                 contemporaries = select_contemporaries(external["birth"], external["death"])
 
             except:
@@ -98,9 +98,7 @@ def select_blob(uri):
     trustedGraph = "http://slobr.linkedmusic.org/matchDecisions/DavidLewis"
     #trustedGraph = "http://slobr.linkedmusic.org/matchDecisions"
     selectQuery = selectQuery.format(uri = uri,trustedGraph = trustedGraph)
-    print "+++++++++++++++++++++++++++++++++++++++++++++"
-    print selectQuery
-    print "+++++++++++++++++++++++++++++++++++++++++++++"
+#    print selectQuery
     sparql.setQuery(selectQuery)
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
@@ -128,9 +126,6 @@ def select_blob(uri):
 
     g = Graph().parse(data=json.dumps(extracted), format="json-ld")
     blob = g.serialize(format="json-ld", auto_compact=True, context=context, indent=4)
-    print "--------------------------------"
-    print(blob)
-    print "--------------------------------"
     return json.loads(blob)
     
 def select_episodes(episodePids=None):
@@ -150,6 +145,7 @@ def select_episodes(episodePids=None):
         epVals += "}"
         selectEpisodesQuery = selectEpisodesQuery.format(uri = epVals)
     sparql.setQuery(selectEpisodesQuery)
+    #print selectEpisodesQuery
     sparql.setReturnFormat(JSON)
     episodeResults = sparql.query().convert()
     episodes = list()
@@ -314,10 +310,8 @@ def select_images_by_book(books):
 
 def select_external_contributor(linkedbrainz, reduced):
     if reduced: # try to get just the most basic details (birth/death dates, depiction, bio)
-        print "reduced"
         template = "select_external_reduced_contributor.rq"
     else:
-        print "not reduced"
         template = "select_external_contributor.rq"
     app = current_app._get_current_object()
     sparql = SPARQLWrapper(app.config["ENDPOINT"])
@@ -326,9 +320,9 @@ def select_external_contributor(linkedbrainz, reduced):
     selectExternalQuery = open(app.config["SLOBR_QUERY_DIR"] + template).read()
     linkedbrainz = "BIND(<" + linkedbrainz + ">as ?linkedbrainz) ."
     selectExternalQuery = selectExternalQuery.format(linkedbrainz = linkedbrainz)
-    print "External query: "+ selectExternalQuery
+#    print "External query: "+ selectExternalQuery
     sparql.setQuery(selectExternalQuery)
-    print selectExternalQuery
+#    print selectExternalQuery
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
     external = dict()

@@ -7,9 +7,7 @@ where  {{
             ?linkedbrainz owl:sameAs ?dbpedia .
     }}
     SERVICE <http://dbpedia.org/sparql/> {{
-              ?dbpedia  dbp:birthDate ?birth ;
-                        dbp:deathDate ?death ;
-                        foaf:depiction ?image ;
+              ?dbpedia  foaf:depiction ?image ;
                         dbp:abstract ?bio .
               FILTER(langMatches(lang(?bio), "en")) .
     }}
