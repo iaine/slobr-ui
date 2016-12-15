@@ -141,7 +141,7 @@ def select_episodes(episodePids=None):
         for ep in episodePids:
             # following weirdness is because SPARQL (or Virtuoso?) doesn't seem to like
             # VALUES parameters with expanded URIs
-            epVals += "bbc:" + ep.replace(app.config["EPISODE_BASE"], "") + "\n"
+            epVals += "<" + ep + ">\n"
         epVals += "}"
         selectEpisodesQuery = selectEpisodesQuery.format(uri = epVals)
     sparql.setQuery(selectEpisodesQuery)
