@@ -6,7 +6,7 @@ where  {{
     graph <http://slobr.linkedmusic.org/lbz_dbp> {{
             ?linkedbrainz owl:sameAs ?dbpedia .
     }}
-    SERVICE <http://dbpedia.org/sparql> {{
+    SERVICE <http://dbpedia.org/sparql/> {{
               ?dbpedia  dbp:birthDate ?birth ;
                         dbp:birthPlace ?birthP ;
                         dbp:deathDate ?death ;
